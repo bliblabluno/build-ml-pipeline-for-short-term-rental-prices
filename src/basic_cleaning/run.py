@@ -4,7 +4,10 @@
 import argparse
 import logging
 
+import tempfile
+
 import wandb
+import pandas as pd
 
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
@@ -12,16 +15,33 @@ logger = logging.getLogger()
 
 
 def go(args):
-    run = wandb.init(job_type="basic_cleaning")
-    run.config.update(args)
+    # Using context managers makes run.finish() redundant
+    with wandb.init(job_type="basic_cleaning") as run:
+        run.config.update(args)
 
-    # Download input artifact. This will also log that this script is using this
-    # particular version of the artifact.
-    # artifact_local_path = run.use_artifact(args.input_artifact).file()
+        local_path = run.use_artifact(args.input_artifact).file()
+        df = pd.read_csv(local_path)
 
-    ######################
-    # YOUR CODE HERE     #
-    ######################
+        # Actual data cleaning
+        df = df[df['price'].between(10, 350)].copy()
+        df['reviews_per_month'] = df['reviews_per_month'].fillna(0)
+        df['last_review'] = pd.to_datetime(df['last_review'])
+
+        # Use temporary file as context manager
+        with tempfile.NamedTemporaryFile() as fp:
+            df.to_csv(fp.name, index=False)
+
+            # Create artifact to be able to use description from args
+            artifact = wandb.Artifact(
+                name=args.output_artifact,
+                type=args.output_type,
+                description=args.description
+            )
+            artifact.add_file(fp.name)
+
+            run.log_artifact(artifact)
+            # Wait for artifact to be uploaded before exiting context manager
+            artifact.wait()
 
 
 if __name__ == "__main__":
@@ -29,38 +49,38 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "--input_artifact",
-        type=## INSERT TYPE HERE: str, float or int,
-        help=## INSERT DESCRIPTION HERE,
+        type=str,
+        help='Name of input artifact.',
         required=True,
     )
     parser.add_argument(
         "--output_artifact",
-        type=## INSERT TYPE HERE: str, float or int,
-        help=## INSERT DESCRIPTION HERE,
+        type=str,
+        help='Name of output artifact.',
         required=True,
     )
     parser.add_argument(
         "--output_type",
-        type=## INSERT TYPE HERE: str, float or int,
-        help=## INSERT DESCRIPTION HERE,
+        type=str,
+        help='Type of output artifact.',
         required=True,
     )
     parser.add_argument(
         "--output_description",
-        type=## INSERT TYPE HERE: str, float or int,
-        help=## INSERT DESCRIPTION HERE,
+        type=str,
+        help='Description of output artifact.',
         required=True,
     )
     parser.add_argument(
         "--min_price",
-        type=## INSERT TYPE HERE: str, float or int,
-        help=## INSERT DESCRIPTION HERE,
+        type=float,
+        help='Lower bound for price column.',
         required=True,
     )
     parser.add_argument(
         "--max_price",
-        type=## INSERT TYPE HERE: str, float or int,
-        help=## INSERT DESCRIPTION HERE,
+        type=float,
+        help='Upper bound for price column.',
         required=True,
     )
 
