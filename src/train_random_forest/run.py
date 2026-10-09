@@ -200,7 +200,7 @@ def get_inference_pipeline(rf_config, max_tfidf_features):
             stop_words="english",
         ),
     )
-    
+
     # Let's put everything together
     preprocessor = ColumnTransformer(
         transformers=[
