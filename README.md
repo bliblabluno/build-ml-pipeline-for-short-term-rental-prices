@@ -1,4 +1,8 @@
 # Build an ML Pipeline for Short-Term Rental Prices in NYC
+
+Github Repo URL: [https://github.com/bliblabluno/build-ml-pipeline-for-short-term-rental-prices/]([url](https://github.com/bliblabluno/build-ml-pipeline-for-short-term-rental-prices/))
+Wandb Project URL: [https://forge.coreweave.com/wandb/pramella-technical-university-of-berlin/nyc_airbnb/]([url](https://forge.coreweave.com/wandb/pramella-technical-university-of-berlin/nyc_airbnb/))
+
 You are working for a property management company renting rooms and properties for short periods of 
 time on various rental platforms. You need to estimate the typical price for a given property based 
 on the price of similar properties. Your company receives new data in bulk every week. The model needs 
