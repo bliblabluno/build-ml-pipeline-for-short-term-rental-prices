@@ -89,17 +89,12 @@ def go(config: DictConfig):
                     'stratify_by': config['modeling']['stratify_by']
                 }
             )
-            pass
 
         if "train_random_forest" in active_steps:
-
-            # NOTE: we need to serialize the random forest configuration into JSON
             rf_config = os.path.abspath("rf_config.json")
             with open(rf_config, "w+") as fp:
-                json.dump(dict(config["modeling"]["random_forest"].items()), fp)  # DO NOT TOUCH
+                json.dump(dict(config["modeling"]["random_forest"].items()), fp)
 
-            # NOTE: use the rf_config we just created as the rf_config parameter for the train_random_forest
-            # step
             _ = mlflow.run(
                 str(Path(hydra.utils.get_original_cwd()) / "src" / "train_random_forest"),
                 parameters={
@@ -112,9 +107,6 @@ def go(config: DictConfig):
                     'output_artifact': 'random_forest_model',
                 }
             )
-
-
-            pass
 
         if "test_regression_model" in active_steps:
 
