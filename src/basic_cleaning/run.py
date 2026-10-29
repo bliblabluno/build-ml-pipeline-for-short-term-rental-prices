@@ -27,6 +27,9 @@ def go(args):
         df['reviews_per_month'] = df['reviews_per_month'].fillna(0)
         df['last_review'] = pd.to_datetime(df['last_review'])
 
+        idx = df["longitude"].between(-74.25, -73.50) & df["latitude"].between(40.5, 41.2)
+        df = df[idx].copy()
+
         # Use temporary file as context manager
         with tempfile.NamedTemporaryFile() as fp:
             df.to_csv(fp.name, index=False)
