@@ -23,7 +23,7 @@ def go(args):
         df = pd.read_csv(local_path)
 
         # Actual data cleaning
-        df = df[df['price'].between(10, 350)].copy()
+        df = df[df['price'].between(args.min_price, args.max_price)].copy()
         df['reviews_per_month'] = df['reviews_per_month'].fillna(0)
         df['last_review'] = pd.to_datetime(df['last_review'])
 
