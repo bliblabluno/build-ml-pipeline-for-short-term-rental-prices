@@ -24,7 +24,6 @@ def go(args):
 
         # Actual data cleaning
         df = df[df['price'].between(args.min_price, args.max_price)].copy()
-        df['reviews_per_month'] = df['reviews_per_month'].fillna(0)
         df['last_review'] = pd.to_datetime(df['last_review'])
 
         idx = df["longitude"].between(-74.25, -73.50) & df["latitude"].between(40.5, 41.2)
