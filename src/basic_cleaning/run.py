@@ -21,13 +21,18 @@ def go(args):
 
         local_path = run.use_artifact(args.input_artifact).file()
         df = pd.read_csv(local_path)
+        logger.info("Fetched artifact %s: %d rows", args.input_artifact, len(df))
 
         # Actual data cleaning
         df = df[df['price'].between(args.min_price, args.max_price)].copy()
+        logger.info("Dropped price outliers (%.0f-%.0f): %d rows remaining", args.min_price, args.max_price, len(df))
+
         df['last_review'] = pd.to_datetime(df['last_review'])
+        logger.info("Converted last_review to datetime")
 
         idx = df["longitude"].between(-74.25, -73.50) & df["latitude"].between(40.5, 41.2)
         df = df[idx].copy()
+        logger.info("Dropped out-of-bounds geo rows: %d rows remaining", len(df))
 
         # Use temporary file as context manager
         with tempfile.NamedTemporaryFile() as fp:
@@ -44,6 +49,7 @@ def go(args):
             run.log_artifact(artifact)
             # Wait for artifact to be uploaded before exiting context manager
             artifact.wait()
+            logger.info("Logged artifact %s (%s)", args.output_artifact, args.output_type)
 
 
 if __name__ == "__main__":
